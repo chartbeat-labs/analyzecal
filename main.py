@@ -67,43 +67,42 @@ decorator = oauth2decorator_from_clientsecrets(
     scope='https://www.googleapis.com/auth/plus.me',
     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
-class MainHandler(webapp.RequestHandler):
 
-  @decorator.oauth_aware
-  def get(self):
-    path = os.path.join(os.path.dirname(__file__), 'grant.html')
-    variables = {
-        'url': decorator.authorize_url(),
-        'has_credentials': decorator.has_credentials()
-        }
-    self.response.out.write(template.render(path, variables))
+class MainHandler(webapp.RequestHandler):
+    @decorator.oauth_aware
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__), 'grant.html')
+        variables = {
+            'url': decorator.authorize_url(),
+            'has_credentials': decorator.has_credentials()
+            }
+        self.response.out.write(template.render(path, variables))
 
 
 class AboutHandler(webapp.RequestHandler):
+    @decorator.oauth_required
+    def get(self):
+        try:
+            http = decorator.http()
+            user = service.people().get(userId='me').execute(http=http)
+            text = 'Hello, %s!' % user['displayName']
 
-  @decorator.oauth_required
-  def get(self):
-    try:
-      http = decorator.http()
-      user = service.people().get(userId='me').execute(http=http)
-      text = 'Hello, %s!' % user['displayName']
-
-      path = os.path.join(os.path.dirname(__file__), 'welcome.html')
-      self.response.out.write(template.render(path, {'text': text }))
-    except AccessTokenRefreshError:
-      self.redirect('/')
+            path = os.path.join(os.path.dirname(__file__), 'welcome.html')
+            self.response.out.write(template.render(path, {'text': text}))
+        except AccessTokenRefreshError:
+            self.redirect('/')
 
 
 def main():
-  application = webapp.WSGIApplication(
-      [
-       ('/', MainHandler),
-       ('/about', AboutHandler),
-       (decorator.callback_path, decorator.callback_handler()),
-      ],
-      debug=True)
-  run_wsgi_app(application)
+    application = webapp.WSGIApplication(
+    [
+        ('/', MainHandler),
+        ('/about', AboutHandler),
+        (decorator.callback_path, decorator.callback_handler()),
+    ],
+    debug=True)
+    run_wsgi_app(application)
 
 
 if __name__ == '__main__':
-  main()
+    main()
