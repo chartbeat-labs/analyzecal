@@ -61,7 +61,7 @@ http = httplib2.Http(memcache)
 service = build("calendar", "v3", http=http)
 decorator = oauth2decorator_from_clientsecrets(
     CLIENT_SECRETS,
-    scope='https://www.googleapis.com/auth/calendar',
+    scope='https://www.googleapis.com/auth/calendar.readonly',
     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
 
