@@ -1,14 +1,14 @@
 <html>
   <head>
-    <title>Can Haz Perms?</title>
+    <title>Analyze Calendar</title>
   </head>
   <body>
     {% if has_credentials %}
-    <p>Thanks for granting us permission. Please <a href="/about">proceed to the main
+    <p>Thanks for granting us permission. Please <a href="/analyze">proceed to the main
       application</a>.</p>
     {% else %}
-    <p><a href="{{ url }}">Grant</a> this application permission to read your
-    Google+ information and it will let you know how many followers you have.</p>
+    <p>Please <a href="{{ url }}">grant</a> this application permission to access your
+    Google Calendar.</p>
     {% endif %}
     <p>You can always <a
       href="https://www.google.com/accounts/b/0/IssuedAuthSubTokens">revoke</a>

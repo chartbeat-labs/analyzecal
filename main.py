@@ -58,10 +58,10 @@ href="https://code.google.com/apis/console">APIs Console</a>.
 
 
 http = httplib2.Http(memcache)
-service = build("plus", "v1", http=http)
+service = build("calendar", "v3", http=http)
 decorator = oauth2decorator_from_clientsecrets(
     CLIENT_SECRETS,
-    scope='https://www.googleapis.com/auth/plus.me',
+    scope='https://www.googleapis.com/auth/calendar',
     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
 
@@ -76,16 +76,21 @@ class MainHandler(webapp.RequestHandler):
         self.response.out.write(template.render(path, variables))
 
 
-class AboutHandler(webapp.RequestHandler):
+class AnalyzeHandler(webapp.RequestHandler):
     @decorator.oauth_required
     def get(self):
         try:
             http = decorator.http()
-            user = service.people().get(userId='me').execute(http=http)
-            text = 'Hello, %s!' % user['displayName']
+            request = service.events().list(calendarId='primary')
+            response = request.execute(http=http)
+            events = response.get('items', [])
+            # TODO: only getting the first page. Need to call .next()
+            # and iterate
+            text = 'Events in your calendar: {0}'.format(len(events))
 
-            path = os.path.join(os.path.dirname(__file__), 'welcome.html')
+            path = os.path.join(os.path.dirname(__file__), 'analyze.html')
             self.response.out.write(template.render(path, {'text': text}))
+
         except AccessTokenRefreshError:
             self.redirect('/')
 
@@ -94,7 +99,7 @@ def main():
     application = webapp.WSGIApplication(
     [
         ('/', MainHandler),
-        ('/about', AboutHandler),
+        ('/analyze', AnalyzeHandler),
         (decorator.callback_path, decorator.callback_handler()),
     ],
     debug=True)
