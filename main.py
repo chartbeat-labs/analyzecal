@@ -38,6 +38,8 @@ import jinja2
 from oauth2client.appengine import oauth2decorator_from_clientsecrets
 from oauth2client.client import AccessTokenRefreshError
 
+from utils import str_to_datetime
+
 
 # CLIENT_SECRETS, name of a file containing the OAuth 2.0 information for this
 # application, including client_id and client_secret, which are found
@@ -110,6 +112,9 @@ class AnalyzeHandler(webapp.RequestHandler):
 
             template = jinja_environment.get_template('analyze.html')
             for event in events:
+                end = str_to_datetime(event['end']['dateTime'])
+                start = str_to_datetime(event['start']['dateTime'])
+                event['duration'] = end - start
                 event['as_str'] = pformat(event, indent=2)
             self.response.out.write(template.render({'events': events}))
 

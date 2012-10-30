@@ -6,7 +6,7 @@
     <ul>
     {% for event in events %}
       <li>
-        <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}
+        <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}: {{ event.duration }}
         <pre>{{ event.as_str }}</pre>
       </li>
     {% endfor %}
