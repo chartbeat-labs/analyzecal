@@ -3,6 +3,13 @@
     <title>Analyze Calendar</title>
   </head>
   <body>
-    <p>{{ text }}</p>
+    <ul>
+    {% for event in events %}
+      <li>
+        <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}
+        <pre>{{ event.as_str }}</pre>
+      </li>
+    {% endfor %}
+    </ul>
   </body>
 </html>

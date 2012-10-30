@@ -5,5 +5,13 @@ api_version: 1
 threadsafe: false
 
 handlers:
+- url: /favicon\.ico
+  static_files: static/images/favicon.ico
+  upload: static/images/favicon\.ico
+
 - url: /.*
   script: main.py
+
+libraries:
+- name: jinja2
+  version: 2.6

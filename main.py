@@ -22,16 +22,21 @@ https://developers.google.com/api-client-library/python/platforms/google_app_eng
 __author__ = 'allan@chartbeat.com (Allan Beaufour)'
 
 
-import httplib2
+from datetime import datetime
+from datetime import timedelta
+import logging
 import os
+from pprint import pformat
 
 from apiclient.discovery import build
+from google.appengine.api import memcache
+from google.appengine.api import users
+from google.appengine.ext import webapp
+from google.appengine.ext.webapp.util import run_wsgi_app
+import httplib2
+import jinja2
 from oauth2client.appengine import oauth2decorator_from_clientsecrets
 from oauth2client.client import AccessTokenRefreshError
-from google.appengine.api import memcache
-from google.appengine.ext import webapp
-from google.appengine.ext.webapp import template
-from google.appengine.ext.webapp.util import run_wsgi_app
 
 
 # CLIENT_SECRETS, name of a file containing the OAuth 2.0 information for this
@@ -56,6 +61,9 @@ href="https://code.google.com/apis/console">APIs Console</a>.
 </p>
 """ % CLIENT_SECRETS
 
+NUM_WEEKS = 1
+"""Number of weeks to look back"""
+
 
 http = httplib2.Http(memcache)
 service = build("calendar", "v3", http=http)
@@ -64,32 +72,46 @@ decorator = oauth2decorator_from_clientsecrets(
     scope='https://www.googleapis.com/auth/calendar.readonly',
     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
+jinja_environment = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+
 
 class MainHandler(webapp.RequestHandler):
     @decorator.oauth_aware
     def get(self):
-        path = os.path.join(os.path.dirname(__file__), 'grant.html')
         variables = {
             'url': decorator.authorize_url(),
             'has_credentials': decorator.has_credentials()
             }
-        self.response.out.write(template.render(path, variables))
+        template = jinja_environment.get_template('grant.html')
+        self.response.out.write(template.render(variables))
 
 
 class AnalyzeHandler(webapp.RequestHandler):
     @decorator.oauth_required
     def get(self):
         try:
+            logging.info('Analyzing for: %s', users.get_current_user().nickname())
+            timeMin = datetime.utcnow() - timedelta(weeks=NUM_WEEKS)
+            timeMax = datetime.utcnow()
             http = decorator.http()
-            request = service.events().list(calendarId='primary')
+            request = service.events().list(
+                calendarId='primary',
+                singleEvents=True,
+                timeMin=timeMin.isoformat('T') + 'Z',
+                timeMax = timeMax.isoformat('T') + 'Z',
+                # TODO: don't limit results
+                maxResults=10,
+                )
             response = request.execute(http=http)
             events = response.get('items', [])
             # TODO: only getting the first page. Need to call .next()
             # and iterate
-            text = 'Events in your calendar: {0}'.format(len(events))
 
-            path = os.path.join(os.path.dirname(__file__), 'analyze.html')
-            self.response.out.write(template.render(path, {'text': text}))
+            template = jinja_environment.get_template('analyze.html')
+            for event in events:
+                event['as_str'] = pformat(event, indent=2)
+            self.response.out.write(template.render({'events': events}))
 
         except AccessTokenRefreshError:
             self.redirect('/')
