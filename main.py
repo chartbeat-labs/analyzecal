@@ -22,6 +22,8 @@ https://developers.google.com/api-client-library/python/platforms/google_app_eng
 __author__ = 'allan@chartbeat.com (Allan Beaufour)'
 
 
+from collections import defaultdict
+from collections import OrderedDict
 from datetime import datetime
 from datetime import timedelta
 import logging
@@ -38,6 +40,7 @@ import jinja2
 from oauth2client.appengine import oauth2decorator_from_clientsecrets
 from oauth2client.client import AccessTokenRefreshError
 
+from utils import num_working_days
 from utils import str_to_datetime
 
 
@@ -63,8 +66,23 @@ href="https://code.google.com/apis/console">APIs Console</a>.
 </p>
 """ % CLIENT_SECRETS
 
-NUM_WEEKS = 1
+NUM_WEEKS = 4
 """Number of weeks to look back"""
+
+WORK_DAY_START = 9
+"""Start of the work day"""
+
+WORK_DAY_END = 19
+"""End of the work day"""
+
+WEEKDAY_TO_STR = OrderedDict([
+    (0, 'Monday'),
+    (1, 'Tuesday'),
+    (2, 'Wednesday'),
+    (3, 'Thursday'),
+    (4, 'Friday'),
+    ])
+"""Lookup of weekday num -> day"""
 
 
 http = httplib2.Http(memcache)
@@ -94,6 +112,8 @@ class AnalyzeHandler(webapp.RequestHandler):
     def get(self):
         try:
             logging.info('Analyzing for: %s', users.get_current_user().nickname())
+
+            # Get calender events
             timeMin = datetime.utcnow() - timedelta(weeks=NUM_WEEKS)
             timeMax = datetime.utcnow()
             http = decorator.http()
@@ -101,22 +121,67 @@ class AnalyzeHandler(webapp.RequestHandler):
                 calendarId='primary',
                 singleEvents=True,
                 timeMin=timeMin.isoformat('T') + 'Z',
-                timeMax = timeMax.isoformat('T') + 'Z',
-                # TODO: don't limit results
-                maxResults=10,
+                timeMax=timeMax.isoformat('T') + 'Z',
                 )
             response = request.execute(http=http)
             events = response.get('items', [])
             # TODO: only getting the first page. Need to call .next()
             # and iterate
 
-            template = jinja_environment.get_template('analyze.html')
+            # Iterate over events
+            stats = {
+                'events': 0,
+                }
+            event_days = defaultdict(lambda: 0)
+            attendees = 0
+            total_duration_in_secs = 0
             for event in events:
-                end = str_to_datetime(event['end']['dateTime'])
+                _ac = event['_ac'] = {}
+                if 'dateTime' not in event['start']:
+                    # All-day events
+                    continue
+
                 start = str_to_datetime(event['start']['dateTime'])
-                event['duration'] = end - start
-                event['as_str'] = pformat(event, indent=2)
-            self.response.out.write(template.render({'events': events}))
+                end = str_to_datetime(event['end']['dateTime'])
+
+                _ac['duration'] = end - start
+
+                if event['summary'] == 'Lunch':
+                    # Don't count lunches as events
+                    continue
+                if end.hour < WORK_DAY_START or start.hour > WORK_DAY_END:
+                    # TODO: will miss multi-day events
+                    continue
+                if start.weekday() > 4 or end.weekday() > 4:
+                    # TODO: will exclude events ending or starting in
+                    # weekends, but stretching into the week
+                    continue
+
+                _ac['included'] = True
+                total_duration_in_secs += _ac['duration'].total_seconds()
+                event_days[start.weekday()] += 1
+                stats['events'] += 1
+                # if list not present, Default to 1 attendant (self)
+                attendees += len(event.get('attendees', ['1']))
+
+            # Calculate stats
+            stats['event_days'] = OrderedDict((v, event_days[k]) for (k, v) in WEEKDAY_TO_STR.iteritems())
+            stats['total_hours'] = total_duration_in_secs / 60 / 60
+            stats['working_days'] = num_working_days(timeMin, timeMax)
+            stats['working_hours'] = (WORK_DAY_END - WORK_DAY_START) * stats['working_days']
+            stats['percent_events'] = (stats['total_hours'] / stats['working_hours']) * 100
+            stats['avg_attendees'] = attendees / stats['events']
+            stats['avg_events_day'] = stats['events'] / stats['working_days']
+            stats['events_excluded'] = len(events) - stats['events']
+
+            # Render
+            data = {
+                'events': events,
+                'stats': stats,
+                'pformat': pformat,
+                }
+            template = jinja_environment.get_template('analyze.html')
+            self.response.out.write(template.render(data))
 
         except AccessTokenRefreshError:
             self.redirect('/')

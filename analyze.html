@@ -3,11 +3,15 @@
     <title>Analyze Calendar</title>
   </head>
   <body>
+    <pre>
+      {{ pformat(stats, indent=2) }}
+    </pre>
     <ul>
     {% for event in events %}
       <li>
-        <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}: {{ event.duration }}
-        <pre>{{ event.as_str }}</pre>
+        <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}: {{ event._ac.duration }}
+        (Included: {{ event._ac.included }})
+        <pre>{{ pformat(event, indent=2) }}</pre>
       </li>
     {% endfor %}
     </ul>
