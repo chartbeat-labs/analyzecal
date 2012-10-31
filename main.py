@@ -117,16 +117,18 @@ class AnalyzeHandler(webapp.RequestHandler):
             timeMin = datetime.utcnow() - timedelta(weeks=NUM_WEEKS)
             timeMax = datetime.utcnow()
             http = decorator.http()
-            request = service.events().list(
+            events = []
+            endpoint = service.events()
+            request = endpoint.list(
                 calendarId='primary',
                 singleEvents=True,
                 timeMin=timeMin.isoformat('T') + 'Z',
                 timeMax=timeMax.isoformat('T') + 'Z',
                 )
-            response = request.execute(http=http)
-            events = response.get('items', [])
-            # TODO: only getting the first page. Need to call .next()
-            # and iterate
+            while request is not None:
+                response = request.execute(http=http)
+                events.extend(response.get('items', []))
+                request = endpoint.list_next(request, response)
 
             # Iterate over events
             stats = {
