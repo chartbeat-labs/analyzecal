@@ -141,6 +141,10 @@ class AnalyzeHandler(webapp.RequestHandler):
                     # All-day events
                     continue
 
+                # TODO: Sort out declined and tentative events, if not
+                # event.organizer.self, find self in event.attendees
+                # list(dict)), 'email' = self and 'responseStatus' =
+                # 'accepted'
                 start = str_to_datetime(event['start']['dateTime'])
                 end = str_to_datetime(event['end']['dateTime'])
 
