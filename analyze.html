@@ -1,11 +1,16 @@
 <html>
   <head>
-    <title>Analyze Calendar</title>
+    <title>Analyze Calendar - {{ cal_name }}</title>
   </head>
   <body>
+    <h1>Analyze Calendar</h1>
+
+    <h2>Stats for: {{ cal_name }}</h2>
     <pre>
       {{ pformat(stats, indent=2) }}
     </pre>
+
+    <h2>Raw Events</h2>
     <ul>
     {% for event in events %}
       <li>

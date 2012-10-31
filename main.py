@@ -84,6 +84,8 @@ WEEKDAY_TO_STR = OrderedDict([
     ])
 """Lookup of weekday num -> day"""
 
+CAL_ID = 'primary'
+
 
 http = httplib2.Http(memcache)
 service = build("calendar", "v3", http=http)
@@ -107,10 +109,11 @@ class MainHandler(webapp.RequestHandler):
         self.response.out.write(template.render(variables))
 
 
-def _get_events(time_min, time_max):
+def _get_events(cal_id, time_min, time_max):
     """
     Retrieve events from the Google API
 
+    @param cal_id: str, calendar id
     @param time_min: datetime, from time
     @param time_max: datetime, to time
     @return: list(events)
@@ -120,7 +123,7 @@ def _get_events(time_min, time_max):
     events = []
     endpoint = service.events()
     request = endpoint.list(
-        calendarId='primary',
+        calendarId=cal_id,
         singleEvents=True,
         timeMin=time_min.isoformat('T') + 'Z',
         timeMax=time_max.isoformat('T') + 'Z',
@@ -133,6 +136,20 @@ def _get_events(time_min, time_max):
     return events
 
 
+def _get_cal_name(cal_id):
+    """
+    Retrieve the name (summary) for a calendar.
+
+    @param cal_id: str, calendar id
+    @return: str, calendar name
+    """
+
+    http = decorator.http()
+    response = service.calendars().get(calendarId=cal_id).execute(http=http)
+    logging.warning(response)
+    return response['summary']
+
+
 def _generate_stats(time_min, time_max, events):
     """
     Generate stats from a list of events.
@@ -143,9 +160,7 @@ def _generate_stats(time_min, time_max, events):
     @return: list(events)
     """
 
-    stats = {
-        'events': 0,
-        }
+    num_events = 0
     event_days = defaultdict(lambda: 0)
     attendees = 0
     total_duration_in_secs = 0
@@ -178,11 +193,13 @@ def _generate_stats(time_min, time_max, events):
         _ac['included'] = True
         total_duration_in_secs += _ac['duration'].total_seconds()
         event_days[start.weekday()] += 1
-        stats['events'] += 1
+        num_events += 1
         # if list not present, Default to 1 attendant (self)
         attendees += len(event.get('attendees', ['1']))
 
     # Calculate stats
+    stats = {}
+    stats['events'] = num_events
     stats['event_days'] = OrderedDict((v, event_days[k]) for (k, v) in WEEKDAY_TO_STR.iteritems())
     stats['total_hours'] = total_duration_in_secs / 60 / 60
     stats['working_days'] = num_working_days(time_min, time_max)
@@ -204,15 +221,17 @@ class AnalyzeHandler(webapp.RequestHandler):
         time_max = datetime.utcnow()
 
         try:
-            events = _get_events(time_min, time_max)
+            events = _get_events(CAL_ID, time_min, time_max)
         except AccessTokenRefreshError:
             return self.redirect('/')
+        cal_name = _get_cal_name(CAL_ID)
 
         stats = _generate_stats(time_min, time_max, events)
 
         data = {
             'events': events,
             'stats': stats,
+            'cal_name': cal_name,
             'pformat': pformat,
             }
         template = jinja_environment.get_template('analyze.html')
