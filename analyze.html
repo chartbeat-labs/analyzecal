@@ -1,6 +1,38 @@
 {% include "parts/header.html" %}
 
 <h2>Stats for: {{ cal_name }}</h2>
+
+<script>
+  var stats = {{ stats_json }};
+</script>
+
+<h3>Percent Time Booked</h3>
+<div id="event_time" class="pie"></div>
+
+<h3>Events Per Weekday</h3>
+<div id="weekdays" class="pie"></div>
+
+<h3>Misc</h3>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Data</th><th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Average Events/day</td><td> {{ stats.avg_events_day }}</td>
+    </tr>
+    <tr>
+      <td>Average Attendees</td><td>{{ stats.avg_attendees }}</td>
+    </tr>
+    <tr>
+      <td>Total Events</td><td>{{ stats.events }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Raw Stats </h2>
 <pre>
   {{ pformat(stats, indent=2) }}
 </pre>

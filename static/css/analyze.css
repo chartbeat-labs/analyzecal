@@ -1,0 +1,11 @@
+.pie {
+    width: 300px;
+    height: 300px;
+}
+
+.pie_label {
+    font-size: 8pt;
+    text-align: center;
+    padding: 2px;
+    color: white;
+}

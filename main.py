@@ -26,6 +26,7 @@ from collections import defaultdict
 from collections import OrderedDict
 from datetime import datetime
 from datetime import timedelta
+import json
 import logging
 import os
 from pprint import pformat
@@ -233,10 +234,13 @@ class AnalyzeHandler(webapp.RequestHandler):
         data = {
             'events': events,
             'stats': stats,
+            'stats_json': json.dumps(stats),
             'cal_name': cal_name,
             'pformat': pformat,
             'title': cal_name,
             'page': 'analyze',
+            'js': 'analyze',
+            'css': 'analyze',
             }
         template = jinja_environment.get_template('analyze.html')
         self.response.out.write(template.render(data))
