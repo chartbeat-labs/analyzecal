@@ -32,20 +32,42 @@
   </tbody>
 </table>
 
-<h2>Raw Stats </h2>
-<pre>
-  {{ pformat(stats, indent=2) }}
-</pre>
-
-<h2>Raw Events</h2>
-<ul>
-  {% for event in events %}
-  <li>
-    <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}: {{ event._ac.duration }}
-    (Included: {{ event._ac.included }})
-    <pre>{{ pformat(event, indent=2) }}</pre>
-  </li>
-  {% endfor %}
-</ul>
+<h2>Debug Information</h2>
+<div class="accordion" id="accordion2">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+        Raw Stats
+      </a>
+    </div>
+    <div id="collapseOne" class="accordion-body collapse">
+      <div class="accordion-inner">
+        <pre>
+          {{ pformat(stats, indent=2) }}
+        </pre>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+        Raw Events
+      </a>
+    </div>
+    <div id="collapseTwo" class="accordion-body collapse">
+      <div class="accordion-inner">
+        <ul>
+          {% for event in events %}
+          <li>
+            <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}: {{ event._ac.duration }}
+            (Included: {{ event._ac.included }})
+            <pre>{{ pformat(event, indent=2) }}</pre>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% include "parts/footer.html" %}
