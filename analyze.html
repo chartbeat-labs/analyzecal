@@ -1,28 +1,19 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Analyze Calendar - {{ cal_name }}</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-  </head>
-  <body>
-    <h1>Analyze Calendar</h1>
+{% include "parts/header.html" %}
 
-    <h2>Stats for: {{ cal_name }}</h2>
-    <pre>
-      {{ pformat(stats, indent=2) }}
-    </pre>
+<h2>Stats for: {{ cal_name }}</h2>
+<pre>
+  {{ pformat(stats, indent=2) }}
+</pre>
 
-    <h2>Raw Events</h2>
-    <ul>
-    {% for event in events %}
-      <li>
-        <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}: {{ event._ac.duration }}
-        (Included: {{ event._ac.included }})
-        <pre>{{ pformat(event, indent=2) }}</pre>
-      </li>
-    {% endfor %}
-    </ul>
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-  </body>
-</html>
+<h2>Raw Events</h2>
+<ul>
+  {% for event in events %}
+  <li>
+    <a href="{{ event.htmlLink }}"><i>{{ event.summary }}</i></a> : {{ event.start.dateTime }} - {{ event.end.dateTime }}: {{ event._ac.duration }}
+    (Included: {{ event._ac.included }})
+    <pre>{{ pformat(event, indent=2) }}</pre>
+  </li>
+  {% endfor %}
+</ul>
+
+{% include "parts/footer.html" %}

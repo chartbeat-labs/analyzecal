@@ -101,12 +101,14 @@ jinja_environment = jinja2.Environment(
 class MainHandler(webapp.RequestHandler):
     @decorator.oauth_aware
     def get(self):
-        variables = {
+        data = {
             'url': decorator.authorize_url(),
-            'has_credentials': decorator.has_credentials()
+            'has_credentials': decorator.has_credentials(),
+            'title': 'Welcome',
+            'page': 'home',
             }
         template = jinja_environment.get_template('grant.html')
-        self.response.out.write(template.render(variables))
+        self.response.out.write(template.render(data))
 
 
 def _get_events(cal_id, time_min, time_max):
@@ -233,6 +235,8 @@ class AnalyzeHandler(webapp.RequestHandler):
             'stats': stats,
             'cal_name': cal_name,
             'pformat': pformat,
+            'title': cal_name,
+            'page': 'analyze',
             }
         template = jinja_environment.get_template('analyze.html')
         self.response.out.write(template.render(data))

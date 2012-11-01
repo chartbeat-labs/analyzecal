@@ -1,21 +1,18 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Analyze Calendar</title>
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-  </head>
-  <body>
-    {% if has_credentials %}
-    <p>Thanks for granting us permission. Please <a href="/analyze">proceed to the main
-      application</a>.</p>
-    {% else %}
-    <p>Please <a href="{{ url }}">grant</a> this application permission to access your
-    Google Calendar.</p>
-    {% endif %}
-    <p>You can always <a
-      href="https://www.google.com/accounts/b/0/IssuedAuthSubTokens">revoke</a>
-    permission at any time.</p>
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-  </body>
-</html>
+{% include "parts/header.html" %}
+
+{% if has_credentials %}
+<p>
+  Thanks for granting us permission. Please <a href="/analyze">proceed to the main
+  application</a>.
+</p>
+{% else %}
+<p>
+  Please <a href="{{ url }}">grant</a> this application permission to access your
+  Google Calendar.
+</p>
+{% endif %}
+<p>
+  You can always <a href="https://www.google.com/accounts/b/0/IssuedAuthSubTokens">revoke</a> permission at any time.
+</p>
+
+{% include "parts/footer.html" %}
