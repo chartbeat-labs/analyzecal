@@ -29,6 +29,12 @@
     <tr>
       <td>Total Events</td><td>{{ stats.events }}</td>
     </tr>
+    <tr>
+      <td>Booked Hours</td><td>{{ stats.event_hours|round|int }}</td>
+    </tr>
+    <tr>
+      <td>Working Hours</td><td>{{ stats.working_hours }}</td>
+    </tr>
   </tbody>
 </table>
 

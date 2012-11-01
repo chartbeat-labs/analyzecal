@@ -204,10 +204,10 @@ def _generate_stats(time_min, time_max, events):
     stats = {}
     stats['events'] = num_events
     stats['event_days'] = OrderedDict((v, event_days[k]) for (k, v) in WEEKDAY_TO_STR.iteritems())
-    stats['total_hours'] = total_duration_in_secs / 60 / 60
+    stats['event_hours'] = total_duration_in_secs / 60 / 60
     stats['working_days'] = num_working_days(time_min, time_max)
     stats['working_hours'] = (WORK_DAY_END - WORK_DAY_START) * stats['working_days']
-    stats['percent_events'] = (stats['total_hours'] / stats['working_hours']) * 100
+    stats['percent_events'] = (stats['event_hours'] / stats['working_hours']) * 100
     stats['avg_attendees'] = attendees / stats['events']
     stats['avg_events_day'] = stats['events'] / stats['working_days']
     stats['events_excluded'] = len(events) - stats['events']
