@@ -7,7 +7,7 @@
 <form action="/analyze" method="get">
   <select name="cal">
     {% for item in items|sort(attribute='summary') %}
-    <option value="{{ item.id }}">{{ item.summary }}</option>
+    <option value="{{ item.id }}"{% if item.id == primary %} selected="selected"{% endif %}>{{ item.summary }}</option>
   {% endfor %}
   </select>
   <br/>

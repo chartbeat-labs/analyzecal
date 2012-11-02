@@ -16,6 +16,7 @@ from handlers.env import template_engine
 from utils.calendar import num_working_days
 from utils.calendar import str_to_datetime
 from utils.gae import get_all_items
+from utils.gae import get_cal_name
 
 DEFAULT_WEEKS = 4
 """Default number of weeks to look back"""
@@ -56,19 +57,6 @@ def _get_events(cal_id, time_min, time_max):
         )
 
     return get_all_items(service.events(), params, decorator.http())
-
-
-def _get_cal_name(cal_id):
-    """
-    Retrieve the name (summary) for a calendar.
-
-    @param cal_id: str, calendar id
-    @return: str, calendar name
-    """
-
-    http = decorator.http()
-    response = service.calendars().get(calendarId=cal_id).execute(http=http)
-    return response['summary']
 
 
 def _generate_stats(time_min, time_max, events):
@@ -159,7 +147,7 @@ class AnalyzeHandler(webapp.RequestHandler):
             events = _get_events(cal_id, time_min, time_max)
         except AccessTokenRefreshError:
             return self.redirect('/')
-        cal_name = _get_cal_name(cal_id)
+        cal_name = get_cal_name(cal_id, service, decorator.http())
 
         stats = _generate_stats(time_min, time_max, events)
 

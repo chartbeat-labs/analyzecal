@@ -19,3 +19,14 @@ def get_all_items(endpoint, params, http):
         request = endpoint.list_next(request, response)
 
     return items
+
+def get_cal_name(cal_id, service, http):
+    """
+    Retrieve the name (summary) for a calendar.
+
+    @param cal_id: str, calendar id
+    @return: str, calendar name
+    """
+
+    response = service.calendars().get(calendarId=cal_id).execute(http=http)
+    return response['summary']
