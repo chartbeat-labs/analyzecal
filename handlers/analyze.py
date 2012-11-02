@@ -17,8 +17,8 @@ from utils.calendar import num_working_days
 from utils.calendar import str_to_datetime
 from utils.gae import get_all_items
 
-NUM_WEEKS = 4
-"""Number of weeks to look back"""
+DEFAULT_WEEKS = 4
+"""Default number of weeks to look back"""
 
 WORK_DAY_START = 9
 """Start of the work day"""
@@ -36,6 +36,7 @@ WEEKDAY_TO_STR = OrderedDict([
 """Lookup of weekday num -> day"""
 
 DEFAULT_CAL_ID = 'primary'
+"""Default calendar id to analyze"""
 
 
 def _get_events(cal_id, time_min, time_max):
@@ -145,7 +146,12 @@ class AnalyzeHandler(webapp.RequestHandler):
     def get(self):
         logging.info('Analyzing for: %s', users.get_current_user().nickname())
 
-        time_min = datetime.utcnow() - timedelta(weeks=NUM_WEEKS)
+        try:
+            weeks = int(self.request.get('weeks'))
+        except ValueError:
+            weeks = DEFAULT_WEEKS
+
+        time_min = datetime.utcnow() - timedelta(weeks=weeks)
         time_max = datetime.utcnow()
 
         cal_id = self.request.get('cal', default_value=DEFAULT_CAL_ID)
@@ -157,8 +163,15 @@ class AnalyzeHandler(webapp.RequestHandler):
 
         stats = _generate_stats(time_min, time_max, events)
 
+        params = {
+            'weeks': weeks,
+            'cal_id': cal_id,
+            'time_min': time_min,
+            'time_max': time_max,
+            }
         data = {
             'events': events,
+            'params': params,
             'stats': stats,
             'stats_json': json.dumps(stats),
             'cal_name': cal_name,

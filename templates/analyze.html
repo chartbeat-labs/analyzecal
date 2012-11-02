@@ -40,27 +40,44 @@
 
 <h2>Debug Information</h2>
 <div class="accordion" id="accordion2">
+
   <div class="accordion-group">
     <div class="accordion-heading">
       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-        Raw Stats
+        Parameters
       </a>
     </div>
     <div id="collapseOne" class="accordion-body collapse">
       <div class="accordion-inner">
         <pre>
-          {{ pformat(stats, indent=2) }}
+{{ pformat(params, indent=2) }}
         </pre>
       </div>
     </div>
   </div>
+
   <div class="accordion-group">
     <div class="accordion-heading">
       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-        Raw Events
+        Raw Stats
       </a>
     </div>
     <div id="collapseTwo" class="accordion-body collapse">
+      <div class="accordion-inner">
+        <pre>
+{{ pformat(stats, indent=2) }}
+        </pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+        Raw Events
+      </a>
+    </div>
+    <div id="collapseThree" class="accordion-body collapse">
       <div class="accordion-inner">
         <ul>
           {% for event in events %}
@@ -74,6 +91,7 @@
       </div>
     </div>
   </div>
+
 </div>
 
 {% include "parts/footer.html" %}
