@@ -5,6 +5,10 @@ from handlers.env import template_engine
 
 
 class IndexHandler(webapp.RequestHandler):
+    """
+    Index/welcome page for the application.
+    """
+
     @decorator.oauth_aware
     def get(self):
         data = {
