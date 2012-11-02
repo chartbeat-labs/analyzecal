@@ -13,5 +13,5 @@ class IndexHandler(webapp.RequestHandler):
             'title': 'Welcome',
             'page': 'home',
             }
-        template = template_engine.get_template('grant.html')
+        template = template_engine.get_template('index.html')
         self.response.out.write(template.render(data))
