@@ -85,37 +85,41 @@ def _generate_stats(time_min, time_max, events):
     attendees = 0
     total_duration_in_secs = 0
     for event in events:
-        _ac = event['_ac'] = {}
-        if 'dateTime' not in event['start']:
-            # All-day events
-            continue
+        try:
+            _ac = event['_ac'] = {}
+            if 'dateTime' not in event['start']:
+                # All-day events
+                continue
 
-        # TODO: Sort out declined and tentative events, if not
-        # event.organizer.self, find self in event.attendees
-        # list(dict)), 'email' = self and 'responseStatus' =
-        # 'accepted'
-        start = str_to_datetime(event['start']['dateTime'])
-        end = str_to_datetime(event['end']['dateTime'])
+            # TODO: Sort out declined and tentative events, if not
+            # event.organizer.self, find self in event.attendees
+            # list(dict)), 'email' = self and 'responseStatus' =
+            # 'accepted'
+            start = str_to_datetime(event['start']['dateTime'])
+            end = str_to_datetime(event['end']['dateTime'])
 
-        _ac['duration'] = end - start
+            _ac['duration'] = end - start
 
-        if event['summary'] == 'Lunch':
-            # Don't count lunches as events
-            continue
-        if end.hour < WORK_DAY_START or start.hour > WORK_DAY_END:
-            # TODO: will miss multi-day events
-            continue
-        if start.weekday() > 4 or end.weekday() > 4:
-            # TODO: will exclude events ending or starting in
-            # weekends, but stretching into the week
-            continue
+            if event['summary'] == 'Lunch':
+                # Don't count lunches as events
+                continue
+            if end.hour < WORK_DAY_START or start.hour > WORK_DAY_END:
+                # TODO: will miss multi-day events
+                continue
+            if start.weekday() > 4 or end.weekday() > 4:
+                # TODO: will exclude events ending or starting in
+                # weekends, but stretching into the week
+                continue
 
-        _ac['included'] = True
-        total_duration_in_secs += _ac['duration'].total_seconds()
-        event_days[start.weekday()] += 1
-        num_events += 1
-        # if list not present, Default to 1 attendant (self)
-        attendees += len(event.get('attendees', ['1']))
+            _ac['included'] = True
+            total_duration_in_secs += _ac['duration'].total_seconds()
+            event_days[start.weekday()] += 1
+            num_events += 1
+            # if list not present, Default to 1 attendant (self)
+            attendees += len(event.get('attendees', ['1']))
+        except Exception:
+            logging.exception('Could not process: {0}'.format(event))
+            raise
 
     # Calculate stats
     stats = {}
