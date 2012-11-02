@@ -1,3 +1,7 @@
+"""
+Calendar related utility functions
+"""
+
 DT_FORMAT = '%Y-%m-%dT%H:%M:%S'
 """Date/time format string"""
 
