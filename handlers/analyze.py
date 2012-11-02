@@ -100,7 +100,7 @@ def _generate_stats(time_min, time_max, events):
 
             _ac['duration'] = end - start
 
-            if event['summary'] == 'Lunch':
+            if event.get('summary', '') == 'Lunch':
                 # Don't count lunches as events
                 continue
             if end.hour < WORK_DAY_START or start.hour > WORK_DAY_END:
