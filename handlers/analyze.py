@@ -35,7 +35,7 @@ WEEKDAY_TO_STR = OrderedDict([
     ])
 """Lookup of weekday num -> day"""
 
-CAL_ID = 'primary'
+DEFAULT_CAL_ID = 'primary'
 
 
 def _get_events(cal_id, time_min, time_max):
@@ -145,11 +145,12 @@ class AnalyzeHandler(webapp.RequestHandler):
         time_min = datetime.utcnow() - timedelta(weeks=NUM_WEEKS)
         time_max = datetime.utcnow()
 
+        cal_id = self.request.get('cal', default_value=DEFAULT_CAL_ID)
         try:
-            events = _get_events(CAL_ID, time_min, time_max)
+            events = _get_events(cal_id, time_min, time_max)
         except AccessTokenRefreshError:
             return self.redirect('/')
-        cal_name = _get_cal_name(CAL_ID)
+        cal_name = _get_cal_name(cal_id)
 
         stats = _generate_stats(time_min, time_max, events)
 

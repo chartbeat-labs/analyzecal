@@ -1,0 +1,17 @@
+{% include "parts/header.html" %}
+
+<p>
+  Chose the calendar you want to analyze:
+</p>
+
+<form action="/analyze" method="get">
+  <select name="cal">
+    {% for item in items|sort(attribute='summary') %}
+    <option value="{{ item.id }}">{{ item.summary }}</option>
+  {% endfor %}
+  </select>
+  <br/>
+  <input type="submit"/>
+</form>
+
+{% include "parts/footer.html" %}

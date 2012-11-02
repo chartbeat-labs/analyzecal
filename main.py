@@ -26,6 +26,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 from handlers.analyze import AnalyzeHandler
+from handlers.choose_cal import ChooseCalendarHandler
 from handlers.env import decorator
 from handlers.index import IndexHandler
 
@@ -34,6 +35,7 @@ def main():
     application = webapp.WSGIApplication(
     [
         ('/', IndexHandler),
+        ('/choose_cal', ChooseCalendarHandler),
         ('/analyze', AnalyzeHandler),
         (decorator.callback_path, decorator.callback_handler()),
     ],
