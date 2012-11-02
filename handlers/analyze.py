@@ -67,7 +67,6 @@ def _get_cal_name(cal_id):
 
     http = decorator.http()
     response = service.calendars().get(calendarId=cal_id).execute(http=http)
-    logging.warning(response)
     return response['summary']
 
 
