@@ -1,7 +1,7 @@
 from datetime import datetime
 import unittest
 
-from utils import num_working_days
+from utils.calendar import num_working_days
 
 
 class NumWorkingDaysTest(unittest.TestCase):

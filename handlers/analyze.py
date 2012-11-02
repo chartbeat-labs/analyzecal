@@ -13,8 +13,8 @@ from oauth2client.client import AccessTokenRefreshError
 from handlers.env import decorator
 from handlers.env import service
 from handlers.env import template_engine
-from utils import num_working_days
-from utils import str_to_datetime
+from utils.calendar import num_working_days
+from utils.calendar import str_to_datetime
 
 NUM_WEEKS = 4
 """Number of weeks to look back"""
