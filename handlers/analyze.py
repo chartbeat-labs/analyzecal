@@ -15,6 +15,7 @@ from handlers.env import service
 from handlers.env import template_engine
 from utils.calendar import num_working_days
 from utils.calendar import str_to_datetime
+from utils.gae import get_all_items
 
 NUM_WEEKS = 4
 """Number of weeks to look back"""
@@ -46,22 +47,14 @@ def _get_events(cal_id, time_min, time_max):
     @param time_max: datetime, to time
     @return: list(events)
     """
-
-    http = decorator.http()
-    events = []
-    endpoint = service.events()
-    request = endpoint.list(
+    params = dict(
         calendarId=cal_id,
         singleEvents=True,
         timeMin=time_min.isoformat('T') + 'Z',
         timeMax=time_max.isoformat('T') + 'Z',
         )
-    while request is not None:
-        response = request.execute(http=http)
-        events.extend(response.get('items', []))
-        request = endpoint.list_next(request, response)
 
-    return events
+    return get_all_items(service.events(), params, decorator.http())
 
 
 def _get_cal_name(cal_id):
