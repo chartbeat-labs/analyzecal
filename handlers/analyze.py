@@ -141,6 +141,10 @@ def _generate_stats(time_min, time_max, events):
 
 
 class AnalyzeHandler(webapp.RequestHandler):
+    """
+    Analyzes a calendar and shows the result to the user.
+    """
+
     @decorator.oauth_required
     def get(self):
         logging.info('Analyzing for: %s', users.get_current_user().nickname())
