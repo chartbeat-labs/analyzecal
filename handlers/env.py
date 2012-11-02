@@ -41,6 +41,6 @@ decorator = oauth2decorator_from_clientsecrets(
     scope=SCOPE,
     message=MISSING_CLIENT_SECRETS_MESSAGE)
 
-template_dir = os.path.join(os.path.dirname(__file__), '../')
+template_dir = os.path.join(os.path.dirname(__file__), '../templates/')
 logging.info('Loading templates from: {0}'.format(template_dir))
 template_engine = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
