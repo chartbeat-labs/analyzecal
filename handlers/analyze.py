@@ -77,7 +77,7 @@ def _generate_stats(time_min, time_max, events):
     @param events: list(events), events to analyze
     @param time_min: datetime, from time
     @param time_max: datetime, to time
-    @return: list(events)
+    @return: dict(), stats object
     """
 
     num_events = 0
