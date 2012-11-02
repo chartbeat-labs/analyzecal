@@ -164,10 +164,12 @@ class AnalyzeHandler(webapp.RequestHandler):
         stats = _generate_stats(time_min, time_max, events)
 
         params = {
-            'weeks': weeks,
             'cal_id': cal_id,
             'time_min': time_min,
             'time_max': time_max,
+            'weeks': weeks,
+            'work_day_start': WORK_DAY_START,
+            'work_day_end': WORK_DAY_END,
             }
         data = {
             'events': events,
