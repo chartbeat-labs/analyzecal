@@ -1,3 +1,4 @@
+from google.appengine.api import users
 from google.appengine.ext import webapp
 
 from handlers.env import decorator
@@ -16,6 +17,7 @@ class IndexHandler(webapp.RequestHandler):
             'has_credentials': decorator.has_credentials(),
             'title': 'Welcome',
             'page': 'home',
+            'logout_url': users.create_logout_url('/'),
             }
         template = template_engine.get_template('index.html')
         self.response.out.write(template.render(data))
