@@ -147,6 +147,7 @@ class AnalyzeHandler(webapp.RequestHandler):
         time_max = datetime.utcnow()
 
         cal_id = self.request.get('cal', default_value=DEFAULT_CAL_ID)
+        # TODO: The get_events and get_cal_name calls should be concurrent
         try:
             events = _get_events(cal_id, time_min, time_max)
         except AccessTokenRefreshError:
