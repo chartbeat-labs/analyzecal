@@ -28,18 +28,29 @@ function plot_pie(nodeid, data) {
         );
 };
 
-function plot_lines(nodeid, data) {
-  $.plot($(nodeid), [data],
-         {
+function plot_series(nodeid, data, from, to) {
+  var options = {
            xaxis: {
              mode: "time",
              tickLength: 5
            },
+           bars: {
+             show: true
+           },
+           selection: {
+             mode: "x"
+           },
            legend: {
              show: false
            }
-         }
-        );
+         };
+  if (from) {
+    options.xaxis.min = from;
+  }
+  if (to) {
+    options.xaxis.max = to;
+  }
+  $.plot($(nodeid), [data], options);
 };
 
 function flot_series(orig) {
@@ -65,8 +76,15 @@ function flot_array(orig) {
 $(document).ready(
   function()
   {
-    plot_lines("#series", flot_array(stats.event_series));
-
+    var event_series = flot_array(stats.event_series);
+    plot_series("#series", event_series);
+    $("#series").bind("plotselected",
+                      function (event, ranges) {
+                        plot_series("#series", event_series,
+                                   ranges.xaxis.from,
+                                   ranges.xaxis.to);
+                        }
+                     );
     plot_pie("#weekdays", flot_series(stats.event_days));
 
     var percent_events = Math.round(stats.percent_events);
