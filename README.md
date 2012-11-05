@@ -21,3 +21,4 @@ Useful Links
 * [Using API Client with App Engine](https://developers.google.com/api-client-library/python/platforms/google_app_engine)
 * [Flot API](https://github.com/flot/flot/blob/master/API.md)
 * [Flot Examples](http://people.iola.dk/olau/flot/examples/)
+* [Google App Engine Configuration](https://developers.google.com/appengine/docs/python/config/appconfig)
