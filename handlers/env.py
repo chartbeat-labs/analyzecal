@@ -8,11 +8,15 @@ import httplib2
 import jinja2
 from oauth2client.appengine import oauth2decorator_from_clientsecrets
 
+IS_DEV = os.environ['SERVER_SOFTWARE'].startswith('Dev')
+"""Are we running in a Dev environment?"""
+
 # CLIENT_SECRETS, name of a file containing the OAuth 2.0 information for this
 # application, including client_id and client_secret, which are found
 # on the API Access tab on the Google APIs
 # Console <http://code.google.com/apis/console>
-CLIENT_SECRETS = os.path.join(os.path.dirname(__file__), '../client_secrets.json')
+CLIENT_SECRETS = os.path.join(os.path.dirname(__file__),
+                              '../client_secrets{0}.json'.format('_dev' if IS_DEV else ''))
 
 # Helpful message to display in the browser if the CLIENT_SECRETS file
 # is missing.
