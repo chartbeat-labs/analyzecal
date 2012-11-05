@@ -1,3 +1,4 @@
+from calendar import timegm
 from collections import defaultdict
 from collections import OrderedDict
 from datetime import datetime
@@ -73,6 +74,7 @@ def _generate_stats(time_min, time_max, events):
     event_days = defaultdict(lambda: 0)
     attendees = 0
     total_duration_in_secs = 0
+    event_series = defaultdict(lambda: 0)
     for event in events:
         try:
             _ac = event['_ac'] = {}
@@ -102,6 +104,7 @@ def _generate_stats(time_min, time_max, events):
 
             _ac['included'] = True
             total_duration_in_secs += _ac['duration'].total_seconds()
+            event_series[start.date()] += 1
             event_days[start.weekday()] += 1
             num_events += 1
             # if list not present, Default to 1 attendant (self)
@@ -114,6 +117,7 @@ def _generate_stats(time_min, time_max, events):
     stats = {}
     stats['events'] = num_events
     stats['event_days'] = OrderedDict((v, event_days[k]) for (k, v) in WEEKDAY_TO_STR.iteritems())
+    stats['event_series'] = OrderedDict((timegm(k.timetuple()) * 1000, v) for (k, v) in sorted(event_series.iteritems()))
     stats['event_hours'] = total_duration_in_secs / 60 / 60
     stats['working_days'] = num_working_days(time_min, time_max)
     stats['working_hours'] = (WORK_DAY_END - WORK_DAY_START) * stats['working_days']

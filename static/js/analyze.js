@@ -28,16 +28,46 @@ function plot_pie(nodeid, data) {
         );
 };
 
+function plot_lines(nodeid, data) {
+  $.plot($(nodeid), [data],
+         {
+           xaxis: {
+             mode: "time",
+             tickLength: 5
+           },
+           legend: {
+             show: false
+           }
+         }
+        );
+};
+
+function flot_series(orig) {
+  var ret = [];
+  $.each(orig, function(key, val)
+         {
+           ret.push({'label': key, 'data': val});
+         }
+        );
+  return ret;
+};
+
+function flot_array(orig) {
+  var ret = [];
+  $.each(orig, function(key, val)
+         {
+           ret.push([key, val]);
+         }
+        );
+  return ret;
+};
+
 $(document).ready(
   function()
   {
-    var event_days = [];
-    $.each(stats.event_days, function(key, val)
-           {
-             event_days.push({'label': key, 'data': val});
-           }
-          );
-    plot_pie("#weekdays", event_days);
+    plot_lines("#series", flot_array(stats.event_series));
+
+    plot_pie("#weekdays", flot_series(stats.event_days));
 
     var percent_events = Math.round(stats.percent_events);
     var event_time = [
