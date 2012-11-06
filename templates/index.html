@@ -2,12 +2,11 @@
 
 {% if has_credentials %}
 <p>
-  Thanks for granting us permission. Please <a href="/choose_cal">proceed to the main
-  application</a>.
+  Please <a href="/choose_cal">choose a calendar to analyze</a>.
 </p>
 {% else %}
 <p>
-  Please <a href="{{ url }}">grant</a> this application permission to access your
+  Please <a href="{{ url }}">grant this application permission</a> to access your
   Google Calendar.
 </p>
 {% endif %}
