@@ -2,6 +2,7 @@ import logging
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
+from oauth2client.client import AccessTokenRefreshError
 
 from handlers.env import decorator
 from handlers.env import service
@@ -22,14 +23,23 @@ class ChooseCalendarHandler(webapp.RequestHandler):
 
     @decorator.oauth_required
     def get(self):
-        logging.info('Analyzing for: %s', users.get_current_user().nickname())
+        logging.info('Choosing calendar for: %s', users.get_current_user().nickname())
 
-        items = _get_calendar_list()
-        primary = get_cal_name('primary', service, decorator.http())
+        has_credentials = decorator.has_credentials(),
+
+        if has_credentials:
+            try:
+                items = _get_calendar_list()
+                primary = get_cal_name('primary', service, decorator.http())
+            except AccessTokenRefreshError:
+                return self.redirect('/choose_cal')
 
         data = {
             'title': 'Choose Calendar',
             'page': 'analyze',
+            'has_credentials': has_credentials,
+            'auth_url': decorator.authorize_url(),
+            'revoke_url': 'https://www.google.com/accounts/b/0/IssuedAuthSubTokens',
             'primary': primary,
             'items': items,
             }

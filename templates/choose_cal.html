@@ -1,5 +1,7 @@
 {% include "parts/header.html" %}
 
+{% if has_credentials %}
+
 <p>
   Chose the calendar you want to analyze:
 </p>
@@ -13,5 +15,18 @@
   <br/>
   <input type="submit"/>
 </form>
+
+<p>
+  (You can revoke calendar access <a href="{{ revoke_url}}">here</a>)
+</p>
+
+{% else %}
+
+<p>
+  Please <a href="{{ auth_url }}">grant this application access</a> to
+  read your calendar information.
+</p>
+
+{% endif %}
 
 {% include "parts/footer.html" %}
