@@ -30,8 +30,10 @@
   <li>(and many more)</li>
 </ul>
 
+{% if logged_in %}
 <p>
   <a href="{{ logout_url }}">Logout</a>
 </p>
+{% endif %}
 
 {% include "parts/footer.html" %}

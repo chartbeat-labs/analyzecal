@@ -13,6 +13,7 @@ class IndexHandler(webapp.RequestHandler):
         data = {
             'title': 'Welcome',
             'page': 'home',
+            'logged_in': bool(users.get_current_user()),
             'logout_url': users.create_logout_url('/'),
             }
         template = template_engine.get_template('index.html')
